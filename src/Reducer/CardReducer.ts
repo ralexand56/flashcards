@@ -14,7 +14,11 @@ export const CardReducer = (
       return state.id === actions.id
         ? {
             ...state,
-            answerIsCorrect: state.proposed === state.answer ? true : false
+            answerIsCorrect:
+              state.proposed &&
+              state.proposed.toLowerCase() === state.answer.toLowerCase()
+                ? true
+                : false
           }
         : state;
 
