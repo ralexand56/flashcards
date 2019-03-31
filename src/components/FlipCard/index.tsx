@@ -22,11 +22,11 @@ const MainContainer = styled(animated.div)`
   justify-content: center;
   width: ${(props: SideProps) => props.width}px;
   height: ${props => props.height}px;
+  overflow: hidden;
 `;
 
 const Side = styled(animated.div)`
   /* padding: 0.3em; */
-  cursor: pointer;
   background-color: #31333f;
   display: flex;
   justify-content: center;
@@ -37,6 +37,7 @@ const Side = styled(animated.div)`
   width: ${props => props.width}px;
   height: ${props => props.height}px;
   border-radius: 1em;
+  overflow: hidden;
   box-shadow: 0px 10px 30px -5px rgba(0, 0, 0, 0.3);
 `;
 
@@ -45,8 +46,8 @@ export const FlipCard: SFC<Props> = ({
   back,
   handleFlipping,
   isFlipped = true,
-  width = 300,
-  height = 300
+  width = 250,
+  height = 250
 }) => {
   const { opacity, transform } = useSpring({
     opacity: isFlipped ? 1 : 0,
@@ -55,11 +56,27 @@ export const FlipCard: SFC<Props> = ({
   });
 
   return (
-    <MainContainer width={width} height={height} onClick={handleFlipping}>
+    <MainContainer
+      width={width}
+      height={height}
+      onClick={handleFlipping && handleFlipping}
+    >
       <Side
         width={width}
         height={height}
         style={{
+          zIndex: isFlipped ? 1 : 0,
+          opacity,
+          transform: transform.interpolate(t => `${t} rotateX(180deg)`)
+        }}
+      >
+        {back}
+      </Side>
+      <Side
+        width={width}
+        height={height}
+        style={{
+          zIndex: isFlipped ? 0 : 1,
           opacity: opacity.interpolate(o =>
             typeof o === "number" ? 1 - o : 1
           ),
@@ -67,16 +84,6 @@ export const FlipCard: SFC<Props> = ({
         }}
       >
         {front}
-      </Side>
-      <Side
-        width={width}
-        height={height}
-        style={{
-          opacity,
-          transform: transform.interpolate(t => `${t} rotateX(180deg)`)
-        }}
-      >
-        {back}
       </Side>
     </MainContainer>
   );

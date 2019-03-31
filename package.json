@@ -2,7 +2,11 @@
   "name": "flashcards",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://ralexand56.github.io/flashcards/",
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.17",
+    "@fortawesome/free-solid-svg-icons": "^5.8.1",
+    "@fortawesome/react-fontawesome": "^0.1.4",
     "@types/jest": "24.0.11",
     "@types/node": "11.11.6",
     "@types/react": "^16.8.8",
@@ -16,7 +20,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -29,6 +35,7 @@
   ],
   "devDependencies": {
     "@types/styled-components": "^4.1.12",
+    "ghpages": "0.0.10",
     "react-spring": "^8.0.18",
     "styled-components": "^4.2.0"
   }
