@@ -11,16 +11,19 @@ import { answerIsCorrect, answerIsWrong, unAnswered } from "./helpers";
 const MainContainer = styled.main`
   border: 0px solid red;
   color: white;
-  display: grid;
+  /* display: grid;
   grid-template-rows: auto 1fr auto;
   grid-template-areas:
     "header"
     "items"
-    "footer";
+    "footer"; */
   height: 100vh;
 `;
 
 const Header = styled.header`
+  position: fixed;
+  top: 0px;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   grid-area: header;
@@ -32,9 +35,15 @@ const Header = styled.header`
 `;
 
 const Footer = styled.footer`
+  z-index: 1;
+  position: fixed;
+  bottom: 0px;
+  display: flex;
+  justify-content: flex-end;
   grid-area: footer;
   padding: 0.8em;
-  height: 1em;
+  background-color: #17181e;
+  width: 100vw;
   box-shadow: 1px 0px 30px -5px rgba(0, 0, 0, 0.3);
 `;
 
@@ -61,12 +70,19 @@ const InfoHeader = styled.section`
 `;
 
 const ItemsGrid = styled.section`
+  /* z-index: -1; */
+  position: fixed;
+  top: 3.2em;
+  right: 0px;
+  bottom: 2.9em;
+  width: 100vw;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   grid-gap: 0.5em;
   grid-area: items;
   justify-items: center;
   overflow: auto;
+  border: 0px solid white;
   padding: 1.5em;
 `;
 
@@ -123,18 +139,6 @@ const App = () => {
           <span style={{ fontWeight: "bold", color: "#DE1E4D" }}>Cards</span>
         </section>
         <RightHeader>
-          <InfoHeader>
-            <FontAwesomeIcon icon="check-circle" color="green" size="lg" />{" "}
-            <Badge>{cards.filter(answerIsCorrect).length}</Badge>
-          </InfoHeader>
-          <InfoHeader>
-            <FontAwesomeIcon icon="times-circle" color="red" size="lg" />{" "}
-            <Badge>{cards.filter(answerIsWrong).length}</Badge>
-          </InfoHeader>
-          <InfoHeader>
-            <FontAwesomeIcon icon="question-circle" size="lg" />{" "}
-            <Badge>{cards.length}</Badge>
-          </InfoHeader>
           {cards.filter(unAnswered).length !== cards.length && (
             <span onClick={() => dispatch({ type: ActionKeys.CARDS_RESET })}>
               <FontAwesomeIcon icon="retweet" size="lg" />
@@ -176,7 +180,22 @@ const App = () => {
             />
           ))}
       </ItemsGrid>
-      <Footer />
+      <Footer>
+        <RightHeader>
+          <InfoHeader>
+            <FontAwesomeIcon icon="check-circle" color="green" size="lg" />{" "}
+            <Badge>{cards.filter(answerIsCorrect).length}</Badge>
+          </InfoHeader>
+          <InfoHeader>
+            <FontAwesomeIcon icon="times-circle" color="red" size="lg" />{" "}
+            <Badge>{cards.filter(answerIsWrong).length}</Badge>
+          </InfoHeader>
+          <InfoHeader>
+            <FontAwesomeIcon icon="question-circle" size="lg" />{" "}
+            <Badge>{cards.length}</Badge>
+          </InfoHeader>
+        </RightHeader>
+      </Footer>
     </MainContainer>
   );
 };
