@@ -9,6 +9,12 @@ export const Reducer = (
     case ActionKeys.CARDS_LOAD:
       return { ...state, cards: actions.cards };
 
+    case ActionKeys.CARDS_RESET:
+      return {
+        ...state,
+        cards: state.cards.map(c => cardReducer(c, actions))
+      };
+
     case ActionKeys.CARD_FLIP:
       return { ...state, cards: state.cards.map(c => cardReducer(c, actions)) };
 

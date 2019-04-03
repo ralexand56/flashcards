@@ -42,7 +42,9 @@ export const FrontQuestionView: SFC<Props> = ({
     <Main style={{ backgroundImage: `url(${q.imageLink})` }}>
       <AnswerContainer>
         <StyledInput
+          lang="ru"
           placeholder="answer..."
+          value={q.proposed}
           onChange={evt => handleProposedChanged(evt.currentTarget.value)}
           onKeyDown={evt => {
             evt.keyCode === 13 && handleFlipping();

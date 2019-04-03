@@ -7,10 +7,12 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faCheck,
   faCheckCircle,
-  faTimesCircle
+  faTimesCircle,
+  faQuestionCircle,
+  faRetweet
 } from "@fortawesome/free-solid-svg-icons";
 
-library.add(faCheck, faCheckCircle, faTimesCircle);
+library.add(faCheck, faCheckCircle, faTimesCircle, faQuestionCircle, faRetweet);
 
 ReactDOM.render(<App />, document.getElementById("root"));
 

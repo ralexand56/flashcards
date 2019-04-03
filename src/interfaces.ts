@@ -2,7 +2,7 @@ export interface LanguageQuestion {
   id: string;
   title: string;
   imageLink: string;
-  proposed?: string;
+  proposed: string;
   answer: string;
   pronunciation?: string;
   audioAnswer: string;
@@ -26,6 +26,7 @@ export interface AppState {
 
 export enum ActionKeys {
   CARDS_LOAD = "[cards] Load",
+  CARDS_RESET = "[cards] Reset",
   CARD_FLIP = "[card] Flip",
   CARD_CHECK_ANSWER = "[card] Check answer",
   CARD_UPDATE_PROPOSED = "[card] Update proposed answer"
@@ -33,6 +34,7 @@ export enum ActionKeys {
 
 export type Actions =
   | LoadCardsAction
+  | ResetCardsAction
   | FlipCardAction
   | CheckAnswerAction
   | UpdateProposedAnswerAction;
@@ -40,6 +42,10 @@ export type Actions =
 interface LoadCardsAction {
   type: ActionKeys.CARDS_LOAD;
   cards: LanguageQuestion[];
+}
+
+interface ResetCardsAction {
+  type: ActionKeys.CARDS_RESET;
 }
 
 interface FlipCardAction {

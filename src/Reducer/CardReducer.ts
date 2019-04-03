@@ -10,6 +10,14 @@ export const CardReducer = (
         ? { ...state, answerRevealed: !state.answerRevealed }
         : state;
 
+    case ActionKeys.CARDS_RESET:
+      return {
+        ...state,
+        answerIsCorrect: null,
+        answerRevealed: false,
+        proposed: ''
+      };
+
     case ActionKeys.CARD_CHECK_ANSWER:
       return state.id === actions.id
         ? {

@@ -5,6 +5,9 @@ import Reducer from "./Reducer";
 import { ActionKeys } from "./interfaces";
 import { BackQuestionView } from "./components/BackQuestionView";
 import { FrontQuestionView } from "./components/FrontQuestionView";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { answerIsCorrect, answerIsWrong, unAnswered } from "./helpers";
+
 const MainContainer = styled.main`
   border: 0px solid red;
   color: white;
@@ -18,6 +21,8 @@ const MainContainer = styled.main`
 `;
 
 const Header = styled.header`
+  display: flex;
+  justify-content: space-between;
   grid-area: header;
   padding: 0.8em;
   text-transform: uppercase;
@@ -31,6 +36,28 @@ const Footer = styled.footer`
   padding: 0.8em;
   height: 1em;
   box-shadow: 1px 0px 30px -5px rgba(0, 0, 0, 0.3);
+`;
+
+const RightHeader = styled.section`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8em;
+  letter-spacing: 0.1em;
+`;
+
+const Badge = styled.section`
+  border-radius: 50%;
+  background: #de1e4d;
+  color: white;
+  padding: 0 0.3em;
+  font-weight: bold;
+  margin: 0 0 0 0.2em;
+`;
+
+const InfoHeader = styled.section`
+  display: flex;
+  margin: 0 0.4em;
 `;
 
 const ItemsGrid = styled.section`
@@ -51,8 +78,6 @@ const App = () => {
 
   const { cards } = state;
 
-  const [isFlipped, setIsFlipped] = useState(false);
-
   useEffect(() => {
     dispatch({
       type: ActionKeys.CARDS_LOAD,
@@ -67,7 +92,8 @@ const App = () => {
           pronunciation: "rabota",
           audioAnswer: "job.mp3",
           answerRevealed: false,
-          answerIsCorrect: null
+          answerIsCorrect: null,
+          proposed: ""
         },
         {
           id: "2",
@@ -80,7 +106,8 @@ const App = () => {
           pronunciation: "rabota",
           audioAnswer: "job.mp3",
           answerRevealed: false,
-          answerIsCorrect: null
+          answerIsCorrect: null,
+          proposed: ""
         }
       ]
     });
@@ -91,8 +118,29 @@ const App = () => {
   return (
     <MainContainer>
       <Header>
-        <span style={{ fontStyle: "italic" }}>Flash</span>
-        <span style={{ fontWeight: "bold" }}>Cards</span>
+        <section>
+          <span style={{ fontStyle: "italic" }}>Flash</span>
+          <span style={{ fontWeight: "bold", color: "#DE1E4D" }}>Cards</span>
+        </section>
+        <RightHeader>
+          <InfoHeader>
+            <FontAwesomeIcon icon="check-circle" color="green" size="lg" />{" "}
+            <Badge>{cards.filter(answerIsCorrect).length}</Badge>
+          </InfoHeader>
+          <InfoHeader>
+            <FontAwesomeIcon icon="times-circle" color="red" size="lg" />{" "}
+            <Badge>{cards.filter(answerIsWrong).length}</Badge>
+          </InfoHeader>
+          <InfoHeader>
+            <FontAwesomeIcon icon="question-circle" size="lg" />{" "}
+            <Badge>{cards.length}</Badge>
+          </InfoHeader>
+          {cards.filter(unAnswered).length !== cards.length && (
+            <span onClick={() => dispatch({ type: ActionKeys.CARDS_RESET })}>
+              <FontAwesomeIcon icon="retweet" size="lg" />
+            </span>
+          )}
+        </RightHeader>
       </Header>
       <ItemsGrid>
         {cards
