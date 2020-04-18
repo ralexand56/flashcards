@@ -67,11 +67,14 @@ const StyledButton = styled.button`
 `;
 
 const AlternateText = styled.header`
-  position: relative;
+  text-align: right;
+  background: rgba(255, 255, 255, 0.8);
   margin-bottom: 8em;
   color: #2d0c15;
   font-weight: bold;
   font-size: 1em;
+  width: 100%;
+  padding: 0.5em;
 `;
 
 export const FrontQuestionView: SFC<Props> = ({

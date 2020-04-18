@@ -179,7 +179,10 @@ const App = () => {
           )}
         </RightHeader>
       </Header>
-      <Home cards={cards} dispatch={dispatch} />
+      <Routes>
+        <Route path="/" element={<Home cards={cards} dispatch={dispatch} />} />
+        <Route path=":id" element={<EditCard />} />
+      </Routes>
       <Footer>
         <WordInput
           newWord={newWord}
@@ -237,13 +240,13 @@ const Home = ({
         };
 
         const handleBackFlipping = () => {
-            const updatedAnswer = {
-              ...x,
-              answerRevealed: !x.answerRevealed,
-            };
+          const updatedAnswer = {
+            ...x,
+            answerRevealed: !x.answerRevealed,
+          };
 
-            db.collection("words").doc(x.id).set(updatedAnswer);
-        }
+          db.collection("words").doc(x.id).set(updatedAnswer);
+        };
 
         return (
           <FlipCard
@@ -255,7 +258,9 @@ const Home = ({
                 handleProposedChanged={handleProposedChanged}
               />
             }
-            back={<BackQuestionView handleFlipping={handleBackFlipping} q={x} />}
+            back={
+              <BackQuestionView handleFlipping={handleBackFlipping} q={x} />
+            }
             isFlipped={x.answerRevealed}
           />
         );
