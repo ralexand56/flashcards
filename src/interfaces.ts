@@ -6,12 +6,14 @@ export interface LanguageQuestion {
   answer: string;
   pronunciation?: string;
   audioAnswer: string;
-  type: "audio" | "text";
+  type: QuestionType;
   groupId: string;
   group?: Group;
   answerRevealed: boolean;
   answerIsCorrect: boolean | null;
 }
+
+export declare type QuestionType = "audio" | "text";
 
 export interface Group {
   id: string;
@@ -29,7 +31,7 @@ export enum ActionKeys {
   CARDS_RESET = "[cards] Reset",
   CARD_FLIP = "[card] Flip",
   CARD_CHECK_ANSWER = "[card] Check answer",
-  CARD_UPDATE_PROPOSED = "[card] Update proposed answer"
+  CARD_UPDATE_PROPOSED = "[card] Update proposed answer",
 }
 
 export type Actions =

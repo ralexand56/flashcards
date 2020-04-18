@@ -2,11 +2,15 @@ import React, { useState, useReducer, useEffect } from "react";
 import FlipCard from "./components/FlipCard";
 import styled, { css } from "styled-components";
 import Reducer from "./Reducer";
-import { ActionKeys } from "./interfaces";
+import { ActionKeys, LanguageQuestion, QuestionType } from "./interfaces";
 import { BackQuestionView } from "./components/BackQuestionView";
 import { FrontQuestionView } from "./components/FrontQuestionView";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { answerIsCorrect, answerIsWrong, unAnswered } from "./helpers";
+import { answerIsCorrect, answerIsWrong, unAnswered, baseUrl } from "./helpers";
+import { Link, Routes, Route } from "react-router-dom";
+import WordInput from "./components/WordInput";
+import { db } from "./firebase";
+import EditCard from "./components/EditCard";
 
 const MainContainer = styled.main`
   border: 0px solid red;
@@ -26,6 +30,7 @@ const Header = styled.header`
   width: 100%;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   grid-area: header;
   padding: 0.8em;
   text-transform: uppercase;
@@ -39,17 +44,18 @@ const Footer = styled.footer`
   position: fixed;
   bottom: 0px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   grid-area: footer;
   padding: 0.8em;
   background-color: #17181e;
+  border: solid 0px;
   width: 100vw;
   box-shadow: 1px 0px 30px -5px rgba(0, 0, 0, 0.3);
 `;
 
 const RightHeader = styled.section`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   font-size: 0.8em;
   letter-spacing: 0.1em;
@@ -89,98 +95,151 @@ const ItemsGrid = styled.section`
 const App = () => {
   const [state, dispatch] = useReducer(Reducer, {
     cards: [],
-    groups: [{ id: "1", name: "Russian Verbs" }]
+    groups: [{ id: "1", name: "Russian Verbs" }],
+  });
+
+  const [newWord, setNewWord] = React.useState<LanguageQuestion>({
+    id: "",
+    imageLink: "/images/missing.jpg",
+    title: "",
+    answer: "",
+    groupId: "1",
+    proposed: "",
+    audioAnswer: "",
+    answerIsCorrect: null,
+    answerRevealed: false,
+    type: "text",
   });
 
   const { cards } = state;
 
-  useEffect(() => {
-    dispatch({
-      type: ActionKeys.CARDS_LOAD,
-      cards: [
-        {
-          id: "1",
-          title: "",
-          imageLink: "https://media.giphy.com/media/stv1Dliu5TrMs/giphy.gif",
-          type: "text",
-          groupId: "1",
-          answer: "работа",
-          pronunciation: "rabota",
-          audioAnswer: "job.mp3",
-          answerRevealed: false,
-          answerIsCorrect: null,
-          proposed: ""
-        },
-        {
-          id: "2",
-          title: "",
-          imageLink:
-            "https://media.kaboom.org/app/assets/resources/000/002/279/original/cities4.jpg",
-          type: "text",
-          groupId: "1",
-          answer: "работа",
-          pronunciation: "rabota",
-          audioAnswer: "job.mp3",
-          answerRevealed: false,
-          answerIsCorrect: null,
-          proposed: ""
-        }
-      ]
+  const addWord = async () => {
+    db.collection("words").add(newWord);
+    setNewWord({
+      ...newWord,
+      answer: "",
+      title: "",
+      imageLink: "/images/missing.jpg",
     });
+  };
+
+  const resetCards = () => {
+    cards.map((x) => {
+      const resetCard = {
+        ...x,
+        answerIsCorrect: null,
+        answerRevealed: false,
+        proposed: "",
+      };
+
+      db.collection("words").doc(x.id).set(resetCard);
+    });
+  };
+
+  useEffect(() => {
+    const getWords = async () => {
+      db.collection("words").onSnapshot((data) => {
+        const cards: LanguageQuestion[] = data.docs
+          .map((x) => ({
+            ...(x.data() as LanguageQuestion),
+            id: x.id,
+          }))
+          .sort((a, b) => a.title.localeCompare(b.title));
+        
+        dispatch({
+          type: ActionKeys.CARDS_LOAD,
+          cards,
+        });
+      });
+    };
+
+    getWords();
   }, []);
 
-  // console.dir(state);
+  const Home = () => {
+    return (
+      <ItemsGrid>
+        {cards.map((x) => (
+          <FlipCard
+            key={x.id}
+            front={
+              <FrontQuestionView
+                q={x}
+                handleFlipping={() => {
+                  const updatedAnswer = {
+                    ...x,
+                    answerRevealed: !x.answerRevealed,
+                    answerIsCorrect:
+                      x.proposed &&
+                      x.proposed.toLowerCase() === x.answer.toLowerCase()
+                        ? true
+                        : false,
+                  };
+
+                  db.collection("words").doc(x.id).set(updatedAnswer);
+                }}
+                handleProposedChanged={(val) =>
+                  dispatch({
+                    type: ActionKeys.CARD_UPDATE_PROPOSED,
+                    id: x.id,
+                    proposed: val,
+                  })
+                }
+              />
+            }
+            back={
+              <BackQuestionView
+                q={x}
+                handleFlipping={() => {
+                  const updatedAnswer = {
+                    ...x,
+                    answerRevealed: !x.answerRevealed,
+                  };
+
+                  db.collection("words").doc(x.id).set(updatedAnswer);
+                }}
+              />
+            }
+            isFlipped={x.answerRevealed}
+          />
+        ))}
+      </ItemsGrid>
+    );
+  };
 
   return (
     <MainContainer>
       <Header>
-        <section>
-          <span style={{ fontStyle: "italic" }}>Flash</span>
+        <StyledLink to="/">
+          <span style={{ fontStyle: "italic", color: "white" }}>Flash</span>
           <span style={{ fontWeight: "bold", color: "#DE1E4D" }}>Cards</span>
-        </section>
+        </StyledLink>
+        {(newWord.title || newWord.answer) && (
+          <WordContainer>
+            <span>New: </span>
+            <WordView>{newWord.title}</WordView>
+            <FontAwesomeIcon icon="arrow-right" />
+            <WordView>{newWord.answer}</WordView>
+          </WordContainer>
+        )}
         <RightHeader>
           {cards.filter(unAnswered).length !== cards.length && (
-            <span onClick={() => dispatch({ type: ActionKeys.CARDS_RESET })}>
+            <span onClick={() => resetCards()}>
               <FontAwesomeIcon icon="retweet" size="lg" />
             </span>
           )}
         </RightHeader>
       </Header>
-      <ItemsGrid>
-        {cards
-          .sort((a, b) => a.id.localeCompare(b.id))
-          .map(x => (
-            <FlipCard
-              key={x.id}
-              front={
-                <FrontQuestionView
-                  q={x}
-                  handleFlipping={() => {
-                    dispatch({ type: ActionKeys.CARD_FLIP, id: x.id });
-                    dispatch({ type: ActionKeys.CARD_CHECK_ANSWER, id: x.id });
-                  }}
-                  handleProposedChanged={val =>
-                    dispatch({
-                      type: ActionKeys.CARD_UPDATE_PROPOSED,
-                      id: x.id,
-                      proposed: val
-                    })
-                  }
-                />
-              }
-              back={
-                <BackQuestionView
-                  q={x}
-                  handleFlipping={() =>
-                    dispatch({ type: ActionKeys.CARD_FLIP, id: x.id })
-                  }
-                />
-              }
-              isFlipped={x.answerRevealed}
-            />
-          ))}
-      </ItemsGrid>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path=":id" element={<EditCard />} />
+      </Routes>
       <Footer>
+        <WordInput
+          newWord={newWord}
+          setNewWord={setNewWord}
+          addWord={addWord}
+        />
         <RightHeader>
           <InfoHeader>
             <FontAwesomeIcon icon="check-circle" color="green" size="lg" />{" "}
@@ -201,3 +260,22 @@ const App = () => {
 };
 
 export default App;
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
+`;
+
+const WordContainer = styled.article`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: solid 0px;
+  text-transform: uppercase;
+`;
+
+const WordView = styled.article`
+  display: flex;
+  align-items: flex-start;
+  margin: 1em;
+  border: solid 0px;
+`;

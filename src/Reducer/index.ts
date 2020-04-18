@@ -7,22 +7,34 @@ export const Reducer = (
 ): AppState => {
   switch (actions.type) {
     case ActionKeys.CARDS_LOAD:
-      return { ...state, cards: actions.cards };
+      return {
+        ...state,
+        cards: actions.cards,
+      };
 
     case ActionKeys.CARDS_RESET:
       return {
         ...state,
-        cards: state.cards.map(c => cardReducer(c, actions))
+        cards: state.cards.map((c) => cardReducer(c, actions)),
       };
 
     case ActionKeys.CARD_FLIP:
-      return { ...state, cards: state.cards.map(c => cardReducer(c, actions)) };
+      return {
+        ...state,
+        cards: state.cards.map((c) => cardReducer(c, actions)),
+      };
 
     case ActionKeys.CARD_CHECK_ANSWER:
-      return { ...state, cards: state.cards.map(c => cardReducer(c, actions)) };
+      return {
+        ...state,
+        cards: state.cards.map((c) => cardReducer(c, actions)),
+      };
 
     case ActionKeys.CARD_UPDATE_PROPOSED:
-      return { ...state, cards: state.cards.map(c => cardReducer(c, actions)) };
+      return {
+        ...state,
+        cards: state.cards.map((c) => cardReducer(c, actions)),
+      };
 
     default:
       return state;
