@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useEffect } from "react";
+import React, { useState, useReducer, useEffect, ChangeEvent } from "react";
 import FlipCard from "./components/FlipCard";
 import styled, { css } from "styled-components";
 import Reducer from "./Reducer";
@@ -145,7 +145,7 @@ const App = () => {
             id: x.id,
           }))
           .sort((a, b) => a.title.localeCompare(b.title));
-        
+
         dispatch({
           type: ActionKeys.CARDS_LOAD,
           cards,
@@ -155,57 +155,6 @@ const App = () => {
 
     getWords();
   }, []);
-
-  const Home = () => {
-    return (
-      <ItemsGrid>
-        {cards.map((x) => (
-          <FlipCard
-            key={x.id}
-            front={
-              <FrontQuestionView
-                q={x}
-                handleFlipping={() => {
-                  const updatedAnswer = {
-                    ...x,
-                    answerRevealed: !x.answerRevealed,
-                    answerIsCorrect:
-                      x.proposed &&
-                      x.proposed.toLowerCase() === x.answer.toLowerCase()
-                        ? true
-                        : false,
-                  };
-
-                  db.collection("words").doc(x.id).set(updatedAnswer);
-                }}
-                handleProposedChanged={(val) =>
-                  dispatch({
-                    type: ActionKeys.CARD_UPDATE_PROPOSED,
-                    id: x.id,
-                    proposed: val,
-                  })
-                }
-              />
-            }
-            back={
-              <BackQuestionView
-                q={x}
-                handleFlipping={() => {
-                  const updatedAnswer = {
-                    ...x,
-                    answerRevealed: !x.answerRevealed,
-                  };
-
-                  db.collection("words").doc(x.id).set(updatedAnswer);
-                }}
-              />
-            }
-            isFlipped={x.answerRevealed}
-          />
-        ))}
-      </ItemsGrid>
-    );
-  };
 
   return (
     <MainContainer>
@@ -230,10 +179,7 @@ const App = () => {
           )}
         </RightHeader>
       </Header>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path=":id" element={<EditCard />} />
-      </Routes>
+      <Home cards={cards} dispatch={dispatch} />
       <Footer>
         <WordInput
           newWord={newWord}
@@ -256,6 +202,65 @@ const App = () => {
         </RightHeader>
       </Footer>
     </MainContainer>
+  );
+};
+
+const Home = ({
+  cards,
+  dispatch,
+}: {
+  cards: LanguageQuestion[];
+  dispatch: any;
+}) => {
+  return (
+    <ItemsGrid>
+      {cards.map((x) => {
+        const handleProposedChanged = (e: ChangeEvent<HTMLInputElement>) => {
+          dispatch({
+            type: ActionKeys.CARD_UPDATE_PROPOSED,
+            id: x.id,
+            proposed: e.target.value,
+          });
+        };
+
+        const handleFlipping = () => {
+          const updatedAnswer = {
+            ...x,
+            answerRevealed: !x.answerRevealed,
+            answerIsCorrect:
+              x.proposed && x.proposed.toLowerCase() === x.answer.toLowerCase()
+                ? true
+                : false,
+          };
+
+          db.collection("words").doc(x.id).set(updatedAnswer);
+        };
+
+        const handleBackFlipping = () => {
+            const updatedAnswer = {
+              ...x,
+              answerRevealed: !x.answerRevealed,
+            };
+
+            db.collection("words").doc(x.id).set(updatedAnswer);
+        }
+
+        return (
+          <FlipCard
+            key={x.id}
+            front={
+              <FrontQuestionView
+                q={x}
+                handleFlipping={handleFlipping}
+                handleProposedChanged={handleProposedChanged}
+              />
+            }
+            back={<BackQuestionView handleFlipping={handleBackFlipping} q={x} />}
+            isFlipped={x.answerRevealed}
+          />
+        );
+      })}
+    </ItemsGrid>
   );
 };
 

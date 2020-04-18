@@ -9,6 +9,7 @@ interface Props {
   back: ReactElement;
   width?: number;
   height?: number;
+  key: string;
 }
 
 interface SideProps {
