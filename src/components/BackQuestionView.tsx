@@ -37,7 +37,7 @@ export const BackQuestionView: SFC<Props> = ({ q, handleFlipping }) => {
       <StyledButton onClick={() => handlePlayAudio(q.audioAnswer)}>
         Play
       </StyledButton>
-      <StyledButton onClick={() => handleFlipping()}>Flip</StyledButton>
+      <StyledButton onClick={handleFlipping}>Flip</StyledButton>
       <Answer
         target="blank"
         href={`https://translate.google.com/#view=home&op=translate&sl=ru&tl=en&text=${q.answer}`}

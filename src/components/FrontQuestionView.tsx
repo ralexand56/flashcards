@@ -1,11 +1,11 @@
-import React, { SFC } from "react";
+import React, { SFC, ChangeEvent } from "react";
 import { LanguageQuestion } from "../interfaces";
 import styled from "styled-components";
 
 interface Props {
   q: LanguageQuestion;
   handleFlipping: () => void;
-  handleProposedChanged: (val: string) => void;
+  handleProposedChanged: (val: ChangeEvent<HTMLInputElement>) => void;
 }
 
 const Main = styled.main`
@@ -80,21 +80,21 @@ export const FrontQuestionView: SFC<Props> = ({
   handleProposedChanged,
 }) => {
   return (
-    <Main style={{ backgroundImage: `url(${q.imageLink})` }}>
+    <Main key={q.id} style={{ backgroundImage: `url(${q.imageLink})` }}>
       <AlternateText>{q.title}</AlternateText>
       <AnswerContainer>
         <StyledInput
+          key={q.id}
           lang="ru"
           type="text"
           required={true}
           placeholder="answer..."
           value={q.proposed}
-          onChange={(evt) => handleProposedChanged(evt.currentTarget.value)}
+          onChange={handleProposedChanged}
           onKeyDown={(evt) => {
             evt.keyCode === 13 && handleFlipping();
           }}
         />
-        <span />
         <StyledButton onClick={handleFlipping}>?</StyledButton>
       </AnswerContainer>
     </Main>
